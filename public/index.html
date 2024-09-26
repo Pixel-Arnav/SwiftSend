@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulk SMS Sender</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <h1>Bulk SMS Sender</h1>
+    <form id="smsForm">
+      <label for="numbers">Enter Phone Numbers (comma-separated):</label>
+      <textarea id="numbers" rows="4" placeholder="e.g., +1234567890, +1987654321"></textarea>
+
+      <label for="message">Message:</label>
+      <textarea id="message" rows="3" placeholder="Your message here..."></textarea>
+
+      <button type="submit" id="sendBtn">Send SMS</button>
+      
+      <div class="loading" id="loading">Sending...</div>
+    </form>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('smsForm');
+    const sendBtn = document.getElementById('sendBtn');
+    const loadingIndicator = document.getElementById('loading');
+    const statusEl = document.getElementById('status');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const numbers = document.getElementById('numbers').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const phoneNumbers = numbers.split(',').map(num => num.trim());
+
+      // Validate inputs
+      if (!numbers || !message) {
+        statusEl.textContent = 'Please fill in all fields!';
+        statusEl.classList.add('error');
+        return;
+      }
+
+      sendBtn.disabled = true;
+      loadingIndicator.classList.add('show');
+      statusEl.textContent = '';
+
+      // Send the request
+      const response = await fetch('/send-sms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          phoneNumbers: phoneNumbers,
+          message: message
+        })
+      });
+
+      const statusText = await response.text();
+      loadingIndicator.classList.remove('show');
+      sendBtn.disabled = false;
+      
+      if (response.ok) {
+        statusEl.textContent = statusText;
+        statusEl.classList.remove('error');
+        statusEl.classList.add('success');
+      } else {
+        statusEl.textContent = 'Error sending messages';
+        statusEl.classList.remove('success');
+        statusEl.classList.add('error');
+      }
+    });
+  </script>
+</body>
+</html>
