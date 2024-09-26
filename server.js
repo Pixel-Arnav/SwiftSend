@@ -27,24 +27,23 @@ if (accountSid && authToken) {
 
 // Route to handle sending SMS
 app.post('/send-sms', (req, res) => {
-  const { message, phoneNumbers } = req.body;
+  const { message, phoneNumber, count = 10 } = req.body; // Default count to 10
 
   if (client && twilioNumbers.length > 0) {
-    // If Twilio is configured, send SMS
-    const promises = phoneNumbers.map(number => {
+    // Send the same SMS 'count' number of times to the same phone number
+    const promises = Array.from({ length: count }).map(() => {
       const randomTwilioNumber = twilioNumbers[Math.floor(Math.random() * twilioNumbers.length)];
       return client.messages.create({
         body: message,
         from: randomTwilioNumber,
-        to: number,
+        to: phoneNumber,  // Sending to the same number
       });
     });
 
     Promise.all(promises)
-      .then(() => res.status(200).send('Messages sent successfully!'))
+      .then(() => res.status(200).send(`Message sent ${count} times successfully!`))
       .catch(error => res.status(500).send(`Error sending messages: ${error.message}`));
   } else {
-    // If Twilio is not configured, just respond with a message
     res.status(200).send('Twilio is not configured. No messages were sent.');
   }
 });
