@@ -1,7 +1,5 @@
-
 const express = require('express');
 const app = express();
-const port = 3000;
 const bodyParser = require('body-parser');
 const twilio = require('twilio');
 
@@ -39,6 +37,9 @@ app.post('/send-sms', (req, res) => {
     .then(results => res.status(200).send('Messages sent successfully!'))
     .catch(error => res.status(500).send('Error sending messages'));
 });
+
+// Heroku's dynamic port or fall back to port 3000
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
   console.log(`Bulk SMS app listening at http://localhost:${port}`);

@@ -1,5 +1,5 @@
 {
-    "name": "SwiftSend",
+    "name": "swiftsend",
     "version": "1.0.0",
     "description": "Bulk SMS sender app using Node.js and Twilio",
     "main": "server.js",
