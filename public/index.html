@@ -117,10 +117,15 @@
       })
       .then(response => response.text())
       .then(data => {
+        // Show success message in the status section
         statusMessage.textContent = data;
         statusMessage.className = 'success';
+
+        // Display a popup after sending the message
+        alert(`${count} messages sent to ${phoneNumber}`);
       })
       .catch(error => {
+        // Show error message in the status section
         statusMessage.textContent = 'Error sending SMS. Please try again.';
         statusMessage.className = 'error';
       });
