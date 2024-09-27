@@ -3,75 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SwiftSend</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Bulk SMS Sender</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .message {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
 </head>
 <body>
-  <div class="app-container">
-    <h1>SwiftSend</h1>
+  <div class="container">
+    <h1>Bulk SMS Sender</h1>
     <form id="smsForm">
-      <label for="numbers">Enter Phone Numbers (comma-separated):</label>
-      <textarea id="numbers" rows="4" placeholder="e.g., +1234567890, +1987654321"></textarea>
+      <label for="phoneNumber">Phone Number</label>
+      <input type="text" id="phoneNumber" placeholder="+1234567890" required>
 
-      <label for="message">Message:</label>
-      <textarea id="message" rows="3" placeholder="Your message here..."></textarea>
+      <label for="message">Message</label>
+      <textarea id="message" rows="5" placeholder="Type your message here..." required></textarea>
 
-      <button type="submit" id="sendBtn">Send SMS</button>
-      
-      <div class="loading" id="loading">Sending...</div>
+      <label for="count">Number of Messages</label>
+      <input type="number" id="count" value="10" required>
+
+      <button type="submit">Send SMS</button>
     </form>
-    <div class="status" id="status"></div>
+
+    <div class="message" id="statusMessage"></div>
   </div>
 
   <script>
     const form = document.getElementById('smsForm');
-    const sendBtn = document.getElementById('sendBtn');
-    const loadingIndicator = document.getElementById('loading');
-    const statusEl = document.getElementById('status');
+    const statusMessage = document.getElementById('statusMessage');
 
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const numbers = document.getElementById('numbers').value.trim();
-      const message = document.getElementById('message').value.trim();
-      const phoneNumbers = numbers.split(',').map(num => num.trim());
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
 
-      // Validate inputs
-      if (!numbers || !message) {
-        statusEl.textContent = 'Please fill in all fields!';
-        statusEl.classList.add('error');
-        return;
-      }
+      const phoneNumber = document.getElementById('phoneNumber').value;
+      const message = document.getElementById('message').value;
+      const count = document.getElementById('count').value;
 
-      sendBtn.disabled = true;
-      loadingIndicator.classList.add('show');
-      statusEl.textContent = '';
-
-      // Send the request
-      const response = await fetch('/send-sms', {
+      fetch('/send-sms', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          phoneNumbers: phoneNumbers,
-          message: message
-        })
+          phoneNumber: phoneNumber,
+          message: message,
+          count: count
+        }),
+      })
+      .then(response => response.text())
+      .then(data => {
+        statusMessage.textContent = data;
+        statusMessage.className = 'success';
+      })
+      .catch(error => {
+        statusMessage.textContent = 'Error sending SMS. Please try again.';
+        statusMessage.className = 'error';
       });
-
-      const statusText = await response.text();
-      loadingIndicator.classList.remove('show');
-      sendBtn.disabled = false;
-      
-      if (response.ok) {
-        statusEl.textContent = statusText;
-        statusEl.classList.remove('error');
-        statusEl.classList.add('success');
-      } else {
-        statusEl.textContent = 'Error sending messages';
-        statusEl.classList.remove('success');
-        statusEl.classList.add('error');
-      }
     });
   </script>
 </body>
