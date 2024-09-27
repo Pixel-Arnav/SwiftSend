@@ -205,6 +205,9 @@
         // Show the popup modal with the SMS details
         modalMessage.textContent = `💬 ${count} messages sent to ${phoneNumber}`;
         modal.style.display = "block";
+
+        // Reset the form fields
+        form.reset();
       })
       .catch(error => {
         // Show error message in the status section
