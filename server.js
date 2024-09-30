@@ -17,12 +17,12 @@ if (accountSid && authToken) {
   // Only initialize Twilio if the credentials are provided
   client = require('twilio')(accountSid, authToken);
   
-  // List of Twilio numbers if you have any
+  // List of Twilio numbers from environment variables
   twilioNumbers = [
-    'YOUR_TWILIO_NUMBER_1',
-    'YOUR_TWILIO_NUMBER_2',
-    'YOUR_TWILIO_NUMBER_3',
-  ];
+    process.env.TWILIO_NUMBER_1,
+    process.env.TWILIO_NUMBER_2,
+    process.env.TWILIO_NUMBER_3,
+  ].filter(Boolean);  // Filter out any undefined numbers
 }
 
 // Route to handle sending SMS
